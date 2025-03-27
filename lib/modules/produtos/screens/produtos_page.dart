@@ -3,9 +3,16 @@ import 'package:flutter/material.dart';
 import '../widgets/brigadeiro_card.dart';
 import '../../../core/data/models.dart';
 import '../../../core/styles.dart';
+import '../../../widgets/bottom_nav_bar.dart';
+import '../../clientes/screens/clientes_page.dart'; // Importe a tela ClientesPage
+import '../../orcamentos/screens/orcamentos_page.dart'; // Importe a tela OrcamentosPage
 
-class ProdutosPage extends StatelessWidget {
-  // Corrigido o nome da classe aqui
+class ProdutosPage extends StatefulWidget {
+  @override
+  _ProdutosPageState createState() => _ProdutosPageState();
+}
+
+class _ProdutosPageState extends State<ProdutosPage> {
   final List<String> categorias = [
     'Todos',
     'Categoria 1',
@@ -32,6 +39,8 @@ class ProdutosPage extends StatelessWidget {
     linhas: [],
     sabores: [],
   );
+
+  int _selectedIndex = 2; // Selecionar "Produtos" por padrão
 
   @override
   Widget build(BuildContext context) {
@@ -103,6 +112,35 @@ class ProdutosPage extends StatelessWidget {
           ),
         ],
       ),
+      bottomNavigationBar: CustomBottomNavigationBar(
+        selectedIndex: _selectedIndex,
+        onItemTapped: _onItemTapped,
+      ),
     );
+  }
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+
+    // Navegar para a página apropriada com pushReplacement
+    if (index == 0) {
+      Navigator.pushReplacementNamed(context, '/'); // Vai para a Home
+    } else if (index == 1) {
+      Navigator.pushReplacement(
+        // Usar pushReplacement para criar nova instancia
+        context,
+        MaterialPageRoute(builder: (context) => ClientesPage()),
+      );
+    } else if (index == 2) {
+      Navigator.pushReplacementNamed(context, '/produtos'); // Vai para Produtos
+    } else if (index == 3) {
+      Navigator.pushReplacement(
+        // Usar pushReplacement para criar nova instancia
+        context,
+        MaterialPageRoute(builder: (context) => OrcamentosPage()),
+      );
+    }
   }
 }

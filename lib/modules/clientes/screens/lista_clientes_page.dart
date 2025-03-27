@@ -1,12 +1,13 @@
-// lib/modules/clientes/screens/lista_clientes_page.dart
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import '../../../widgets/bottom_nav_bar.dart'; // Importe a BottomNavigationBar
+import './clientes_page.dart'; // Importe a ClientesPage
 
 class ListaClientesPage extends StatefulWidget {
   final List<Map<String, String>> clientes;
 
-  ListaClientesPage({required this.clientes});
+  ListaClientesPage({required this.clientes, Key? key}) : super(key: key);
 
   @override
   _ListaClientesPageState createState() => _ListaClientesPageState();
@@ -14,10 +15,9 @@ class ListaClientesPage extends StatefulWidget {
 
 class _ListaClientesPageState extends State<ListaClientesPage> {
   List<Map<String, String>> _clientesExibidos = [];
-  String _filtro = ''; // Campo único de filtro geral
+  String _filtro = '';
   int? _filtroMesAniversario;
   String? _filtroComoConheceu;
-
   List<String> _opcoesComoConheceu = [
     'Indicação',
     'Redes Sociais',
@@ -25,6 +25,7 @@ class _ListaClientesPageState extends State<ListaClientesPage> {
     'Anúncio',
     'Outros',
   ];
+  int _selectedIndex = 1; // Selecionar "Clientes" por padrão
 
   @override
   void initState() {
@@ -40,7 +41,6 @@ class _ListaClientesPageState extends State<ListaClientesPage> {
           bool filtroGeralValido = cliente.values.any(
             (value) => value.toLowerCase().contains(_filtro.toLowerCase()),
           );
-
           bool filtroAniversarioValido =
               _filtroMesAniversario == null ||
               (cliente['aniversario'] != null &&
@@ -55,7 +55,6 @@ class _ListaClientesPageState extends State<ListaClientesPage> {
           bool filtroComoConheceuValido =
               _filtroComoConheceu == null ||
               cliente['comoConheceu'] == _filtroComoConheceu;
-
           return filtroGeralValido &&
               filtroAniversarioValido &&
               filtroComoConheceuValido;
@@ -114,6 +113,10 @@ class _ListaClientesPageState extends State<ListaClientesPage> {
             ),
           ),
         ],
+      ),
+      bottomNavigationBar: CustomBottomNavigationBar(
+        selectedIndex: _selectedIndex,
+        onItemTapped: _onItemTapped,
       ),
     );
   }
@@ -189,5 +192,24 @@ class _ListaClientesPageState extends State<ListaClientesPage> {
         );
       },
     );
+  }
+
+  void _onItemTapped(int index) {
+    if (_selectedIndex == index && index == 1) {
+      // Se já estamos na aba "Clientes" e o usuário clica novamente, volta para ClientesPage
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => ClientesPage()),
+      );
+    } else {
+      setState(() {
+        _selectedIndex = index;
+      });
+
+      // Adicione aqui outras navegações, se necessário
+      if (index == 0) {
+        Navigator.pop(context); // Voltar para a tela anterior
+      }
+    }
   }
 }
