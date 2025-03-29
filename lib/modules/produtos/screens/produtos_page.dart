@@ -8,6 +8,8 @@ import '../widgets/plant_item_card.dart';
 import '../../../screens/home_content.dart';
 import '../../clientes/screens/clientes_page.dart';
 import '../screens/product_detail_page.dart';
+import '../screens/produto_linha_tradicional.dart';
+import './produto_linha_especial.dart'; // Importe a nova página
 import '../../orcamentos/screens/orcamento.dart';
 import '../../../providers/orcamento_provider.dart';
 
@@ -23,12 +25,14 @@ class Plant {
   final String imageUrl;
   final double price;
   final String category;
+  final String linhaTipo; // Adicione a propriedade linhaTipo
 
   Plant({
     required this.name,
     required this.imageUrl,
     required this.price,
     required this.category,
+    required this.linhaTipo, // Inclua linhaTipo no construtor
   });
 
   factory Plant.fromJson(Map<String, dynamic> json) {
@@ -37,6 +41,9 @@ class Plant {
       imageUrl: json['imageUrl'],
       price: json['price'].toDouble(),
       category: json['category'],
+      linhaTipo:
+          json['linhaTipo'] ??
+          '', // Se linhaTipo não existir, use uma string vazia
     );
   }
 }
@@ -294,28 +301,78 @@ class _ProductScreenState extends State<ProductScreen> {
   }
 
   void _openProductDetails(BuildContext context, Plant plant) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder:
-            (context) => ProductDetailPage(
-              productName: plant.name,
-              flavors: {
-                'Linha Tradicional': ['Ao Leite', 'Ninho', 'Uva'],
-                'Linha Especial': ['Pistache', 'Maracujá', 'Romeu e Julieta'],
-              },
-              productImage: plant.imageUrl,
-              onAddToBudget: (orderDetails) {
-                Provider.of<OrcamentoProvider>(
-                  context,
-                  listen: false,
-                ).adicionarItem(orderDetails);
-                print('Adicionado: ${orderDetails['productName']}');
-                Navigator.pop(context);
-              },
-            ),
-      ),
-    );
+    if (plant.linhaTipo == "Tradicional") {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder:
+              (context) => ProdutoLinhaTradicionalPage(
+                productName: plant.name,
+                flavors: [
+                  'Ao Leite',
+                  'Ninho',
+                  'Uva',
+                ], // Passa os sabores diretamente
+                productImage: plant.imageUrl,
+                onAddToBudget: (orderDetails) {
+                  Provider.of<OrcamentoProvider>(
+                    context,
+                    listen: false,
+                  ).adicionarItem(orderDetails);
+                  print('Adicionado: ${orderDetails['productName']}');
+                  Navigator.pop(context);
+                },
+              ),
+        ),
+      );
+    } else if (plant.linhaTipo == "Especial") {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder:
+              (context) => ProdutoLinhaEspecialPage(
+                productName: plant.name,
+                flavors: [
+                  'Pistache',
+                  'Maracujá',
+                  'Romeu e Julieta',
+                ], // Passa os sabores diretamente
+                productImage: plant.imageUrl,
+                onAddToBudget: (orderDetails) {
+                  Provider.of<OrcamentoProvider>(
+                    context,
+                    listen: false,
+                  ).adicionarItem(orderDetails);
+                  print('Adicionado: ${orderDetails['productName']}');
+                  Navigator.pop(context);
+                },
+              ),
+        ),
+      );
+    } else {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder:
+              (context) => ProductDetailPage(
+                productName: plant.name,
+                flavors: {
+                  'Linha Tradicional': ['Ao Leite', 'Ninho', 'Uva'],
+                  'Linha Especial': ['Pistache', 'Maracujá', 'Romeu e Julieta'],
+                },
+                productImage: plant.imageUrl,
+                onAddToBudget: (orderDetails) {
+                  Provider.of<OrcamentoProvider>(
+                    context,
+                    listen: false,
+                  ).adicionarItem(orderDetails);
+                  print('Adicionado: ${orderDetails['productName']}');
+                  Navigator.pop(context);
+                },
+              ),
+        ),
+      );
+    }
   }
 
   void _abrirOrcamento(BuildContext context) {

@@ -1,13 +1,13 @@
 [
     {
-        "name": "Linha Tradicional",
+        "name": "Tradicional",
         "imageUrl": "assets/images/brigadeiros.jpeg",
         "price": 29.99,
         "category": "DOCINHOS",
         "linhaTipo": "Tradicional"
     },
     {
-        "name": "Linha Especial",
+        "name": "Especial",
         "imageUrl": "assets/images/uva.jpeg",
         "price": 29.99,
         "category": "DOCINHOS",

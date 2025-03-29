@@ -73,7 +73,7 @@ class _PlantItemCardState extends State<PlantItemCard> {
                           padding: const EdgeInsets.all(2),
                           child: const Icon(
                             Icons.add,
-                            size: 28,
+                            size: 18,
                             color: Colors.white,
                           ),
                         ),
@@ -81,7 +81,7 @@ class _PlantItemCardState extends State<PlantItemCard> {
                     ],
                   ),
                   Text(
-                    '\$${widget.plant.price.toStringAsFixed(2)}',
+                    'A partir de R\$${widget.plant.price.toStringAsFixed(2)}',
                     style: TextStyle(color: Colors.grey[700], fontSize: 12),
                   ),
                 ],

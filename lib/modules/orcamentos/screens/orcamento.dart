@@ -1,6 +1,9 @@
+// orcamento_page.dart
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../providers/orcamento_provider.dart';
+import '../../../screens/pdf_generator.dart'; // Importe o PDF_generator
+import 'package:open_file/open_file.dart'; // Importe o pacote open_file
 
 class OrcamentoPage extends StatelessWidget {
   const OrcamentoPage({Key? key}) : super(key: key);
@@ -22,7 +25,17 @@ class OrcamentoPage extends StatelessWidget {
                   return _buildOrcamentoItem(context, item);
                 },
               ),
-      bottomNavigationBar: _buildTotalBar(orcamentoItens),
+      bottomNavigationBar: _buildTotalBar(orcamentoItens, context),
+      floatingActionButton:
+          orcamentoItens.isNotEmpty
+              ? FloatingActionButton.extended(
+                onPressed: () {
+                  _gerarPDF(context, orcamentoItens); // Adiciona context
+                },
+                label: const Text('Gerar PDF'),
+                icon: const Icon(Icons.picture_as_pdf),
+              )
+              : null,
     );
   }
 
@@ -32,6 +45,10 @@ class OrcamentoPage extends StatelessWidget {
       0,
       (sum, count) => sum + count,
     );
+
+    // Filtrar sabores com quantidade maior que zero
+    final filteredFlavors =
+        selectedFlavors.entries.where((entry) => entry.value > 0).toList();
 
     return Card(
       margin: const EdgeInsets.all(8.0),
@@ -83,7 +100,7 @@ class OrcamentoPage extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 8),
-            if (selectedFlavors.isNotEmpty)
+            if (filteredFlavors.isNotEmpty) // Usar filteredFlavors aqui
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -91,7 +108,7 @@ class OrcamentoPage extends StatelessWidget {
                     'Sabores:',
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
-                  ...selectedFlavors.entries.map((entry) {
+                  ...filteredFlavors.map((entry) {
                     final flavor = entry.key;
                     final quantidade = entry.value;
                     return Padding(
@@ -130,7 +147,10 @@ class OrcamentoPage extends StatelessWidget {
     );
   }
 
-  Widget _buildTotalBar(List<Map<String, dynamic>> itens) {
+  Widget _buildTotalBar(
+    List<Map<String, dynamic>> itens,
+    BuildContext context,
+  ) {
     double total = itens.fold(
       0.0,
       (sum, item) => sum + (item['totalPrice'] ?? 0.0),
@@ -145,5 +165,20 @@ class OrcamentoPage extends StatelessWidget {
         style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
       ),
     );
+  }
+
+  void _gerarPDF(BuildContext context, List<Map<String, dynamic>> itens) async {
+    //Adiciona context
+    try {
+      final file = await gerarPdfOrcamento(itens);
+      await OpenFile.open(file.path);
+      print('PDF gerado e aberto com sucesso!');
+    } catch (e) {
+      print('Erro ao gerar ou abrir o PDF: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        // Usa context
+        SnackBar(content: Text('Erro ao gerar PDF: $e')),
+      );
+    }
   }
 }
