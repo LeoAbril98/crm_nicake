@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+
 import '../widgets/featured_item_card.dart';
 import '../widgets/popular_item_card.dart';
 import '../widgets/bottom_nav_bar.dart';
 
 import '../modules/clientes/screens/clientes_page.dart';
-import '../modules/produtos/screens/produtos_page.dart';
+import '../modules/produtos/screens/produtos_page.dart'; // Certifique-se de que este import está correto
 import '../modules/orcamentos/screens/orcamentos_page.dart';
 
 class HomeContent extends StatefulWidget {
@@ -18,45 +19,41 @@ class _HomeContentState extends State<HomeContent> {
   int _selectedIndex = 0;
 
   void _onItemTapped(int index) {
-    if (index != _selectedIndex) {
-      setState(() {
-        _selectedIndex = index;
-      });
-    }
+    if (index == _selectedIndex) return; // Evita reprocessamento desnecessário
 
+    setState(() {
+      _selectedIndex = index;
+    });
+
+    Widget nextPage;
     switch (index) {
       case 0:
-        // Início (Já estamos aqui)
-        break;
+        return; // Já estamos na Home
       case 1:
-        // Clientes
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => ClientesPage()),
-        ).then((retorno) {
-          if (retorno != null) {
-            setState(() {
-              _selectedIndex = retorno;
-            });
-          }
-        });
+        nextPage = ClientesPage();
         break;
       case 2:
-        // Produtos
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => ProdutosPage()),
+        nextPage = ProductScreen(
+          selectedIndex: _selectedIndex,
+          onItemTapped: _onItemTapped,
         );
         break;
-
       case 3:
-        // Orçamentos
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => OrcamentosPage()),
+        nextPage = OrcamentosPage(
+          selectedIndex: _selectedIndex,
+          onItemTapped: _onItemTapped,
         );
         break;
+      default:
+        return;
     }
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => nextPage),
+    ).then((_) {
+      setState(() {}); // Força atualização após voltar da tela
+    });
   }
 
   @override
@@ -68,17 +65,13 @@ class _HomeContentState extends State<HomeContent> {
         leading: Padding(
           padding: const EdgeInsets.all(1.0),
           child: Container(
-            width: 72, // Duas vezes o raio do CircleAvatar
-            height: 72, // Duas vezes o raio do CircleAvatar
+            width: 72,
+            height: 72,
             clipBehavior: Clip.antiAlias,
             decoration: const BoxDecoration(shape: BoxShape.circle),
-            child: Image.asset(
-              'assets/images/logo.png', // Sua imagem do logo
-              fit: BoxFit.cover,
-            ),
+            child: Image.asset('assets/images/logo.png', fit: BoxFit.cover),
           ),
         ),
-
         actions: [
           IconButton(
             icon: const Icon(Icons.notifications_none, color: Colors.black),
@@ -88,7 +81,6 @@ class _HomeContentState extends State<HomeContent> {
       ),
       body: ListView(
         children: [
-          // Conteúdo da tela inicial (banners, listas de produtos, etc.)
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: Container(
@@ -124,15 +116,15 @@ class _HomeContentState extends State<HomeContent> {
               padding: const EdgeInsets.only(left: 16.0),
               children: const [
                 FeaturedItemCard(
-                  imageUrl: 'assets/images/order.png', // Imagem de orçamento
+                  imageUrl: 'assets/images/order.png',
                   name: 'Novo Orçamento',
                 ),
                 FeaturedItemCard(
-                  imageUrl: 'assets/images/cliente.png', // Imagem de cliente
+                  imageUrl: 'assets/images/cliente.png',
                   name: 'Novo Cliente',
                 ),
                 FeaturedItemCard(
-                  imageUrl: 'assets/images/bolo.jpg', // Imagem de bolo
+                  imageUrl: 'assets/images/bolo.jpg',
                   name: 'Novo Produto',
                 ),
               ],
@@ -165,23 +157,23 @@ class _HomeContentState extends State<HomeContent> {
               childAspectRatio: 0.8,
               children: const [
                 PopularItemCard(
-                  imageUrl: 'assets/images/bolomorango.jpeg', // Imagem de TV
+                  imageUrl: 'assets/images/bolomorango.jpeg',
                   name: 'Bolo Morango',
                   price: '\$330',
                 ),
                 PopularItemCard(
-                  imageUrl: 'assets/images/doce.jpeg', // Imagem de Macbook
+                  imageUrl: 'assets/images/doce.jpeg',
                   name: 'Doces',
                   price: '\$999',
                 ),
                 PopularItemCard(
-                  imageUrl: 'assets/images/brigadeiros.jpeg', // Imagem padrão
+                  imageUrl: 'assets/images/brigadeiros.jpeg',
                   name: 'Brigadeiros',
                   price: '\$50',
                 ),
                 PopularItemCard(
-                  imageUrl: 'assets/images/uva.jpeg', // Imagem padrão
-                  name: 'surpresinha de uva',
+                  imageUrl: 'assets/images/uva.jpeg',
+                  name: 'Surpresinha de Uva',
                   price: '\$75',
                 ),
               ],

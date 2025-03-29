@@ -1,60 +1,89 @@
-// lib/modules/orcamentos/screens/orcamentos_page.dart
 import 'package:flutter/material.dart';
-import '../../../widgets/bottom_nav_bar.dart'; // Importe o BottomNavigationBar
-import '../../../screens/home_content.dart'; // Importe a tela Home
-import '../../clientes/screens/clientes_page.dart'; // Importe a tela Clientes
-import '../../produtos/screens/produtos_page.dart'; // Importe a tela Produtos
+import '../../../widgets/bottom_nav_bar.dart'; // Bottom Navigation Bar
+import '../../../screens/home_content.dart'; // Tela Home
+import '../../clientes/screens/clientes_page.dart'; // Tela Clientes
+import '../../produtos/screens/produtos_page.dart'; // Tela Produtos
 
 class OrcamentosPage extends StatefulWidget {
-  // Altere para StatefulWidget
+  final int selectedIndex;
+  final Function(int) onItemTapped;
+
+  const OrcamentosPage({
+    Key? key,
+    required this.selectedIndex,
+    required this.onItemTapped,
+  }) : super(key: key);
+
   @override
   _OrcamentosPageState createState() => _OrcamentosPageState();
 }
 
 class _OrcamentosPageState extends State<OrcamentosPage> {
   final List<String> orcamentos = ['Orçamento 1', 'Orçamento 2', 'Orçamento 3'];
-  int _selectedIndex = 3; // Selecionar "Orçamentos" por padrão
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Orçamentos')),
+      appBar: AppBar(title: const Text('Orçamentos')),
       body: ListView.builder(
         itemCount: orcamentos.length,
         itemBuilder: (context, index) {
-          return ListTile(title: Text(orcamentos[index]));
+          return ListTile(
+            title: Text(orcamentos[index]),
+            trailing: IconButton(
+              icon: const Icon(Icons.delete, color: Colors.red),
+              onPressed: () {
+                setState(() {
+                  orcamentos.removeAt(index);
+                });
+              },
+            ),
+          );
         },
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          _criarNovoOrcamento();
+        },
+        child: const Icon(Icons.add),
+      ),
       bottomNavigationBar: CustomBottomNavigationBar(
-        // Adicione o BottomNavigationBar
-        selectedIndex: _selectedIndex,
+        selectedIndex: widget.selectedIndex,
         onItemTapped: _onItemTapped,
       ),
     );
   }
 
-  void _onItemTapped(int index) {
+  void _criarNovoOrcamento() {
     setState(() {
-      _selectedIndex = index;
+      orcamentos.add('Orçamento ${orcamentos.length + 1}');
     });
+  }
 
-    // Navegar para a página apropriada
+  void _onItemTapped(int index) {
+    widget.onItemTapped(index);
+
     if (index == 0) {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => HomeContent()),
-      ); // Navegar para Home
+      );
     } else if (index == 1) {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => ClientesPage()),
-      ); // Navegar para Clientes
+      );
     } else if (index == 2) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => ProdutosPage()),
-      ); // Navegar para Produtos
+        MaterialPageRoute(
+          builder:
+              (context) => ProductScreen(
+                selectedIndex: index,
+                onItemTapped: _onItemTapped,
+              ),
+        ),
+      );
     }
-    // Adicione aqui as navegações para outros índices, se necessário
   }
 }

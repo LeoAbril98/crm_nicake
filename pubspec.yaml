@@ -63,6 +63,7 @@ flutter:
         - assets/images/uva.jpeg
         - assets/images/bolomorango.jpeg
         - assets/images/banner.png
+        - assets/products.json
 
     uses-material-design: true
 

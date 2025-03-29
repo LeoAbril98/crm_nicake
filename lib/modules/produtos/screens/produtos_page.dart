@@ -1,146 +1,269 @@
-// lib/modules/produtos/screens/produtos_page.dart
+import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import '../widgets/brigadeiro_card.dart';
-import '../../../core/data/models.dart';
-import '../../../core/styles.dart';
+import 'package:flutter/services.dart';
 import '../../../widgets/bottom_nav_bar.dart';
-import '../../clientes/screens/clientes_page.dart'; // Importe a tela ClientesPage
-import '../../orcamentos/screens/orcamentos_page.dart'; // Importe a tela OrcamentosPage
+import '../widgets/plant_item_card.dart';
+import '../../../screens/home_content.dart';
+import '../../clientes/screens/clientes_page.dart';
 
-class ProdutosPage extends StatefulWidget {
-  @override
-  _ProdutosPageState createState() => _ProdutosPageState();
+class AppColors {
+  static const Color backgroundGray = Color(0xFFF5F5F5);
+  static const Color primaryGreen = Color(0xFF113f3e);
+  static const Color textDark = Color(0xFF333333);
+  static const Color textGray = Color(0xFF777777);
 }
 
-class _ProdutosPageState extends State<ProdutosPage> {
-  final List<String> categorias = [
-    'Todos',
-    'Categoria 1',
-    'Categoria 2',
-    'Categoria 3',
-    'Categoria 4',
+class Plant {
+  final String name;
+  final String imageUrl;
+  final double price;
+  final String category;
+
+  Plant({
+    required this.name,
+    required this.imageUrl,
+    required this.price,
+    required this.category,
+  });
+
+  factory Plant.fromJson(Map<String, dynamic> json) {
+    return Plant(
+      name: json['name'],
+      imageUrl: json['imageUrl'],
+      price: json['price'].toDouble(),
+      category: json['category'],
+    );
+  }
+}
+
+class ProductScreen extends StatefulWidget {
+  final Function(int) onItemTapped;
+  final int selectedIndex;
+
+  const ProductScreen({
+    super.key,
+    required this.onItemTapped,
+    required this.selectedIndex,
+  });
+
+  @override
+  State<ProductScreen> createState() => _ProductScreenState();
+}
+
+class _ProductScreenState extends State<ProductScreen> {
+  List<Plant> plants = [];
+  List<Plant> filteredPlants = [];
+  final TextEditingController _searchController = TextEditingController();
+  bool _isLoading = true;
+  String _selectedCategory = 'TODOS'; // Estado para categoria selecionada
+
+  final List<String> _categories = [
+    'TODOS',
+    'BOLOS',
+    'DOCINHOS',
+    'TORTAS',
+    'OVOS DE PASCOA',
   ];
 
-  final List<Map<String, dynamic>> produtos = [
-    {
-      'nome': 'Brigadeiros',
-      'preco': 0.00,
-      'imagem': 'https://dummyimage.com/150/000/fff',
-    },
-    {
-      'nome': 'Produto 2',
-      'preco': 39.99,
-      'imagem': 'https://dummyimage.com/150/000/fff',
-    },
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _loadProducts();
+  }
 
-  final BrigadeiroCategoria brigadeirosVazio = BrigadeiroCategoria(
-    nome: 'Brigadeiros',
-    linhas: [],
-    sabores: [],
-  );
+  Future<void> _loadProducts() async {
+    try {
+      final String response = await rootBundle.loadString(
+        'assets/products.json',
+      );
+      final List<dynamic> data = json.decode(response);
+      setState(() {
+        plants = data.map((json) => Plant.fromJson(json)).toList();
+        _filterPlants('');
+        _isLoading = false;
+      });
+    } catch (e) {
+      print('Erro ao carregar produtos: $e');
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
 
-  int _selectedIndex = 2; // Selecionar "Produtos" por padrão
+  void _filterPlants(String query) {
+    setState(() {
+      if (query.isEmpty && _selectedCategory == 'TODOS') {
+        filteredPlants = List.from(plants);
+      } else if (query.isNotEmpty && _selectedCategory == 'TODOS') {
+        filteredPlants =
+            plants
+                .where(
+                  (plant) =>
+                      plant.name.toLowerCase().contains(query.toLowerCase()),
+                )
+                .toList();
+      } else if (query.isEmpty) {
+        filteredPlants =
+            plants
+                .where((plant) => plant.category == _selectedCategory)
+                .toList();
+      } else {
+        filteredPlants =
+            plants
+                .where(
+                  (plant) =>
+                      plant.name.toLowerCase().contains(query.toLowerCase()) &&
+                      plant.category == _selectedCategory,
+                )
+                .toList();
+      }
+    });
+  }
+
+  void _selectCategory(String category) {
+    setState(() {
+      _selectedCategory = category;
+      _filterPlants(_searchController.text);
+    });
+  }
+
+  void _onItemTapped(int index) {
+    widget.onItemTapped(index);
+
+    if (index == 0) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => HomeContent()),
+      );
+    } else if (index == 1) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => ClientesPage()),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Catálogo de Produtos')),
-      body: Column(
-        children: <Widget>[
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Wrap(
-                spacing: 8.0,
-                children:
-                    categorias.map((categoria) {
-                      return Chip(label: Text(categoria));
-                    }).toList(),
-              ),
-            ),
-          ),
-          Expanded(
-            child: GridView.builder(
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                childAspectRatio: AppStyles.productGridChildAspectRatio,
-              ),
-              itemCount: produtos.length,
-              itemBuilder: (context, index) {
-                final produto = produtos[index];
-                return GestureDetector(
-                  onTap: () {
-                    if (produto['nome'] == 'Brigadeiros') {
-                      showModalBottomSheet(
-                        context: context,
-                        builder:
-                            (context) => BrigadeiroCard(
-                              brigadeiroCategoria: brigadeirosVazio,
-                            ),
-                      );
-                    }
-                  },
-                  child: Card(
-                    elevation: AppStyles.productCardElevation,
-                    margin: AppStyles.productCardMargin,
-                    child: Padding(
-                      padding: AppStyles.productCardPadding,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          Image.network(produto['imagem'], height: 100),
-                          SizedBox(height: 8.0),
-                          Text(
-                            produto['nome'],
-                            style: AppStyles.productTitleStyle,
-                            textAlign: TextAlign.center,
-                          ),
-                          SizedBox(height: 4.0),
-                          Text(
-                            'R\$ ${produto['preco'].toStringAsFixed(2)}',
-                            style: AppStyles.productPriceStyle,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
-        ],
+      appBar: AppBar(
+        title: const Text('Produtos'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
       ),
+      body:
+          _isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Bem-vindo ao',
+                        style: TextStyle(
+                          fontSize: 20,
+                          color: AppColors.textGray,
+                        ),
+                      ),
+                      const Text(
+                        'Nicake Shop',
+                        style: TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.textDark,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      CupertinoTextField(
+                        controller: _searchController,
+                        placeholder: 'Buscar',
+                        prefix: const Padding(
+                          padding: EdgeInsets.only(left: 8.0),
+                          child: Icon(
+                            CupertinoIcons.search,
+                            color: AppColors.textGray,
+                          ),
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.backgroundGray,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        onChanged: _filterPlants,
+                      ),
+                      const SizedBox(height: 24),
+                      SizedBox(
+                        height: 30,
+                        child: ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: _categories.length,
+                          itemBuilder: (context, index) {
+                            final category = _categories[index];
+                            final isSelected = _selectedCategory == category;
+                            return Padding(
+                              padding: const EdgeInsets.only(right: 16.0),
+                              child: CupertinoButton(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 6,
+                                ),
+                                color:
+                                    isSelected ? AppColors.primaryGreen : null,
+                                borderRadius: BorderRadius.circular(8),
+                                onPressed: () => _selectCategory(category),
+                                child: Text(
+                                  category,
+                                  style: TextStyle(
+                                    color:
+                                        isSelected
+                                            ? CupertinoColors.white
+                                            : AppColors.textGray,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      GridView.builder(
+                        physics: const NeverScrollableScrollPhysics(),
+                        shrinkWrap: true,
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              crossAxisSpacing: 16,
+                              mainAxisSpacing: 16,
+                              childAspectRatio: 0.75,
+                            ),
+                        itemCount:
+                            filteredPlants.isNotEmpty
+                                ? filteredPlants.length
+                                : plants.length,
+                        itemBuilder: (context, index) {
+                          final plant =
+                              filteredPlants.isNotEmpty
+                                  ? filteredPlants[index]
+                                  : plants[index];
+                          return PlantItemCard(plant: plant);
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ),
       bottomNavigationBar: CustomBottomNavigationBar(
-        selectedIndex: _selectedIndex,
+        selectedIndex: widget.selectedIndex,
         onItemTapped: _onItemTapped,
       ),
     );
-  }
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-
-    // Navegar para a página apropriada com pushReplacement
-    if (index == 0) {
-      Navigator.pushReplacementNamed(context, '/'); // Vai para a Home
-    } else if (index == 1) {
-      Navigator.pushReplacement(
-        // Usar pushReplacement para criar nova instancia
-        context,
-        MaterialPageRoute(builder: (context) => ClientesPage()),
-      );
-    } else if (index == 2) {
-      Navigator.pushReplacementNamed(context, '/produtos'); // Vai para Produtos
-    } else if (index == 3) {
-      Navigator.pushReplacement(
-        // Usar pushReplacement para criar nova instancia
-        context,
-        MaterialPageRoute(builder: (context) => OrcamentosPage()),
-      );
-    }
   }
 }

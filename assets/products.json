@@ -1,0 +1,38 @@
+[
+    {
+        "name": "Succulent Plant",
+        "imageUrl": "assets/images/bolomorango.jpeg",
+        "price": 29.99,
+        "category": "BOLOS"
+    },
+    {
+        "name": "Succulent Plant",
+        "imageUrl": "assets/images/doce.jpeg",
+        "price": 29.99,
+        "category": "DOCINHO"
+    },
+    {
+        "name": "Succulent Plant",
+        "imageUrl": "assets/images/brigadeiros.jpeg",
+        "price": 29.99,
+        "category": "DOCINHO"
+    },
+    {
+        "name": "Succulent Plant",
+        "imageUrl": "assets/images/doce.jpeg",
+        "price": 29.99,
+        "category": "TORTAS"
+    },
+    {
+        "name": "Succulent Plant",
+        "imageUrl": "assets/images/doce.jpeg",
+        "price": 29.99,
+        "category": "BOLOS"
+    },
+    {
+        "name": "Succulent Plant",
+        "imageUrl": "assets/images/uva.jpeg",
+        "price": 29.99,
+        "category": "OVOS DE PASCOA"
+    }
+]
