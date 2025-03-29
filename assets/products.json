@@ -1,21 +1,23 @@
 [
     {
-        "name": "Succulent Plant",
-        "imageUrl": "assets/images/bolomorango.jpeg",
+        "name": "Linha Tradicional",
+        "imageUrl": "assets/images/brigadeiros.jpeg",
         "price": 29.99,
-        "category": "BOLOS"
+        "category": "DOCINHOS",
+        "linhaTipo": "Tradicional"
     },
     {
-        "name": "Succulent Plant",
-        "imageUrl": "assets/images/doce.jpeg",
+        "name": "Linha Especial",
+        "imageUrl": "assets/images/uva.jpeg",
         "price": 29.99,
-        "category": "DOCINHO"
+        "category": "DOCINHOS",
+        "linhaTipo": "Especial"
     },
     {
         "name": "Succulent Plant",
         "imageUrl": "assets/images/brigadeiros.jpeg",
         "price": 29.99,
-        "category": "DOCINHO"
+        "category": "DOCINHOS"
     },
     {
         "name": "Succulent Plant",

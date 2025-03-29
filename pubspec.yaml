@@ -35,6 +35,9 @@ dependencies:
     google_fonts: ^6.2.1
     mask_text_input_formatter: ^2.4.0 # Ou a versão mais recente
     intl: ^0.18.0 # Ou a versão mais recente
+    provider: ^6.0.0 # Ou a versão mais recente
+    path_provider: ^2.0.11 # Ou a versão mais recente
+    lottie: ^2.2.0
 
 dev_dependencies:
     flutter_test:
@@ -64,6 +67,7 @@ flutter:
         - assets/images/bolomorango.jpeg
         - assets/images/banner.png
         - assets/products.json
+        - assets/check_animation.json
 
     uses-material-design: true
 

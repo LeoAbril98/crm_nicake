@@ -2,10 +2,14 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 import '../../../widgets/bottom_nav_bar.dart';
 import '../widgets/plant_item_card.dart';
 import '../../../screens/home_content.dart';
 import '../../clientes/screens/clientes_page.dart';
+import '../screens/product_detail_page.dart';
+import '../../orcamentos/screens/orcamento.dart';
+import '../../../providers/orcamento_provider.dart';
 
 class AppColors {
   static const Color backgroundGray = Color(0xFFF5F5F5);
@@ -42,10 +46,10 @@ class ProductScreen extends StatefulWidget {
   final int selectedIndex;
 
   const ProductScreen({
-    super.key,
+    Key? key,
     required this.onItemTapped,
     required this.selectedIndex,
-  });
+  }) : super(key: key);
 
   @override
   State<ProductScreen> createState() => _ProductScreenState();
@@ -56,7 +60,7 @@ class _ProductScreenState extends State<ProductScreen> {
   List<Plant> filteredPlants = [];
   final TextEditingController _searchController = TextEditingController();
   bool _isLoading = true;
-  String _selectedCategory = 'TODOS'; // Estado para categoria selecionada
+  String _selectedCategory = 'TODOS';
 
   final List<String> _categories = [
     'TODOS',
@@ -253,7 +257,20 @@ class _ProductScreenState extends State<ProductScreen> {
                               filteredPlants.isNotEmpty
                                   ? filteredPlants[index]
                                   : plants[index];
-                          return PlantItemCard(plant: plant);
+                          return PlantItemCard(
+                            plant: plant,
+                            onAddToBudget: (item) {
+                              Provider.of<OrcamentoProvider>(
+                                context,
+                                listen: false,
+                              ).adicionarItem(item);
+                              print(
+                                'Item adicionado ao orçamento: ${item['productName']}',
+                              );
+                            },
+                            onProductTap:
+                                () => _openProductDetails(context, plant),
+                          );
                         },
                       ),
                     ],
@@ -264,6 +281,54 @@ class _ProductScreenState extends State<ProductScreen> {
         selectedIndex: widget.selectedIndex,
         onItemTapped: _onItemTapped,
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          _abrirOrcamento(context);
+        },
+        backgroundColor: AppColors.primaryGreen,
+        foregroundColor: Colors.white,
+        tooltip: 'Ver Orçamento',
+        child: const Icon(Icons.shopping_cart),
+      ),
+    );
+  }
+
+  void _openProductDetails(BuildContext context, Plant plant) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder:
+            (context) => ProductDetailPage(
+              productName: plant.name,
+              flavors: {
+                'Linha Tradicional': ['Ao Leite', 'Ninho', 'Uva'],
+                'Linha Especial': ['Pistache', 'Maracujá', 'Romeu e Julieta'],
+              },
+              productImage: plant.imageUrl,
+              onAddToBudget: (orderDetails) {
+                Provider.of<OrcamentoProvider>(
+                  context,
+                  listen: false,
+                ).adicionarItem(orderDetails);
+                print('Adicionado: ${orderDetails['productName']}');
+                Navigator.pop(context);
+              },
+            ),
+      ),
+    );
+  }
+
+  void _abrirOrcamento(BuildContext context) {
+    Navigator.pushNamed(
+      context,
+      '/orcamento',
+      arguments: {
+        // Passa os sabores como argumentos
+        'flavors': {
+          'Linha Tradicional': ['Ao Leite', 'Ninho', 'Uva'],
+          'Linha Especial': ['Pistache', 'Maracujá', 'Romeu e Julieta'],
+        },
+      },
     );
   }
 }
