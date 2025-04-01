@@ -14,6 +14,7 @@ class ProductDetailPage extends StatefulWidget {
   final Map<String, List<String>> flavors;
   final String productImage;
   final Function(Map<String, dynamic>) onAddToBudget;
+  final String productCategory;
 
   const ProductDetailPage({
     Key? key,
@@ -21,6 +22,7 @@ class ProductDetailPage extends StatefulWidget {
     required this.flavors,
     required this.productImage,
     required this.onAddToBudget,
+    required this.productCategory,
   }) : super(key: key);
 
   @override
@@ -210,6 +212,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
       'selectedFlavors': selectedFlavorCounts,
       'totalPrice': totalPrice,
       'productImage': widget.productImage,
+      'category': widget.productCategory,
     };
     widget.onAddToBudget(orderDetails);
     print('Produto adicionado ao orçamento: ${orderDetails['productName']}');

@@ -37,9 +37,13 @@ dependencies:
     intl: ^0.18.0 # Ou a versão mais recente
     provider: ^6.0.0 # Ou a versão mais recente
     lottie: ^2.2.0
-    pdf: ^3.1.0 # ou a versão mais recente
+    pdf: ^3.10.4 # ou a versão mais recente
     path_provider: ^2.1.2 # ou a versão mais recente
     open_file: ^3.3.2 # Para abrir o PDF (opcional)
+    flutter_cache_manager: ^3.3.1 # ou a versão mais recente
+    printing: ^5.11.0
+    image: ^4.1.3
+    flutter_pdfview: ^1.2.7
 
 dev_dependencies:
     flutter_test:
@@ -62,6 +66,7 @@ flutter:
         - assets/images/order.png
         - assets/images/produtos.png
         - assets/images/bolo.jpg
+        - assets/images/teste.jpg
         - assets/images/logo.png
         - assets/images/brigadeiros.jpeg
         - assets/images/doce.jpeg
@@ -70,7 +75,11 @@ flutter:
         - assets/images/banner.png
         - assets/products.json
         - assets/check_animation.json
-        - assets/images/pdf.jpg
+        - assets/fonts/Roboto-Regular.ttf
+        - assets/fonts/Roboto-Bold.ttf
+        - assets\fonts\Blooming.ttf
+        - assets\fonts\Bloomings.ttf
+        - assets\fonts\Quicksand-Medium.ttf
 
     uses-material-design: true
 

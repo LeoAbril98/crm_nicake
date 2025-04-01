@@ -3,13 +3,18 @@ import 'package:provider/provider.dart';
 import 'package:lottie/lottie.dart';
 
 import '../../../providers/orcamento_provider.dart';
-import './product_detail_style.dart'; // Arquivo de estilos para a Linha Especial
+
+class AppColors {
+  static const Color backgroundGray = Color(0xFFF5F5F5);
+  static const Color primaryGreen = Color(0xFF113f3e);
+}
 
 class ProdutoLinhaEspecialPage extends StatefulWidget {
   final String productName;
   final List<String> flavors;
   final String productImage;
   final Function(Map<String, dynamic>) onAddToBudget;
+  final String productCategory;
 
   const ProdutoLinhaEspecialPage({
     Key? key,
@@ -17,6 +22,7 @@ class ProdutoLinhaEspecialPage extends StatefulWidget {
     required this.flavors,
     required this.productImage,
     required this.onAddToBudget,
+    required this.productCategory,
   }) : super(key: key);
 
   @override
@@ -96,7 +102,7 @@ class _ProdutoLinhaEspecialPageState extends State<ProdutoLinhaEspecialPage> {
           widget.productName,
           style: const TextStyle(color: Colors.white),
         ),
-        backgroundColor: ProdutoLinhaTradicionalStyles.primaryGreen,
+        backgroundColor: AppColors.primaryGreen,
         iconTheme: const IconThemeData(color: Colors.white),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
@@ -105,7 +111,7 @@ class _ProdutoLinhaEspecialPageState extends State<ProdutoLinhaEspecialPage> {
           },
         ),
       ),
-      backgroundColor: ProdutoLinhaTradicionalStyles.backgroundGray,
+      backgroundColor: AppColors.backgroundGray,
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -125,7 +131,7 @@ class _ProdutoLinhaEspecialPageState extends State<ProdutoLinhaEspecialPage> {
             SizedBox(height: 16),
             Text(
               widget.productName,
-              style: ProdutoLinhaTradicionalStyles.productNameTextStyle,
+              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 8),
             const Text(
@@ -155,10 +161,15 @@ class _ProdutoLinhaEspecialPageState extends State<ProdutoLinhaEspecialPage> {
                         _showConfirmationDialog(context);
                       }
                       : null,
-              style:
-                  isButtonEnabled
-                      ? ProdutoLinhaTradicionalStyles.primaryButtonStyle
-                      : ProdutoLinhaTradicionalStyles.disabledButtonStyle,
+              style: ElevatedButton.styleFrom(
+                backgroundColor:
+                    isButtonEnabled ? AppColors.primaryGreen : Colors.grey,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 12,
+                ),
+              ),
               child: const Text('Adicionar ao Orçamento'),
             ),
           ],
@@ -178,6 +189,7 @@ class _ProdutoLinhaEspecialPageState extends State<ProdutoLinhaEspecialPage> {
       'selectedFlavors': selectedFlavorCounts,
       'totalPrice': totalPrice,
       'productImage': widget.productImage,
+      'category': widget.productCategory, // Usando widget.productCategory
     };
     widget.onAddToBudget(orderDetails);
     print('Produto adicionado ao orçamento: ${orderDetails['productName']}');
@@ -228,18 +240,15 @@ class _ProdutoLinhaEspecialPageState extends State<ProdutoLinhaEspecialPage> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
+        const Text(
           'Sabores:',
-          style: ProdutoLinhaTradicionalStyles.flavorHeaderTextStyle,
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
         TextButton(
           onPressed: () {
             _showClearConfirmationDialog(context);
           },
-          child: Text(
-            'Limpar',
-            style: ProdutoLinhaTradicionalStyles.clearButtonStyle,
-          ),
+          child: const Text('Limpar', style: TextStyle(color: Colors.red)),
         ),
       ],
     );
@@ -302,7 +311,6 @@ class _ProdutoLinhaEspecialPageState extends State<ProdutoLinhaEspecialPage> {
   }
 
   Widget _sizeButton(String size) {
-    bool isSelected = selectedSize == size;
     return OutlinedButton(
       onPressed: () {
         setState(() {
@@ -311,11 +319,25 @@ class _ProdutoLinhaEspecialPageState extends State<ProdutoLinhaEspecialPage> {
           _updateTotalFlavorCount();
         });
       },
-      style: ProdutoLinhaTradicionalStyles.outlinedSizeButtonStyle(isSelected),
+      style: OutlinedButton.styleFrom(
+        side: BorderSide(
+          color:
+              selectedSize == size
+                  ? AppColors.primaryGreen
+                  : Colors.grey.shade400,
+        ),
+        backgroundColor:
+            selectedSize == size
+                ? AppColors.primaryGreen.withOpacity(0.1)
+                : Colors.transparent,
+      ),
       child: Text(
         size,
-        style: ProdutoLinhaTradicionalStyles.outlinedSizeButtonTextStyle(
-          isSelected,
+        style: TextStyle(
+          color:
+              selectedSize == size
+                  ? AppColors.primaryGreen
+                  : Colors.grey.shade700,
         ),
       ),
     );
@@ -432,7 +454,7 @@ class _ProdutoLinhaEspecialPageState extends State<ProdutoLinhaEspecialPage> {
         const Text('Total'),
         Text(
           'R\$ $totalPrice',
-          style: ProdutoLinhaTradicionalStyles.totalTextStyle,
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
       ],
     );

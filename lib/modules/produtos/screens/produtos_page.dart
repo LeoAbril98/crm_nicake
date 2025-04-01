@@ -322,6 +322,7 @@ class _ProductScreenState extends State<ProductScreen> {
                   print('Adicionado: ${orderDetails['productName']}');
                   Navigator.pop(context);
                 },
+                productCategory: plant.category,
               ),
         ),
       );
@@ -346,6 +347,7 @@ class _ProductScreenState extends State<ProductScreen> {
                   print('Adicionado: ${orderDetails['productName']}');
                   Navigator.pop(context);
                 },
+                productCategory: plant.category,
               ),
         ),
       );
@@ -369,6 +371,7 @@ class _ProductScreenState extends State<ProductScreen> {
                   print('Adicionado: ${orderDetails['productName']}');
                   Navigator.pop(context);
                 },
+                productCategory: plant.category,
               ),
         ),
       );
